@@ -1,0 +1,69 @@
+package template
+
+templ PageCondShow() {
+	@page() {
+		@ViewCondShow(100, 100)
+	}
+}
+
+templ ViewCondShow(numRed, numBlue int) {
+	@controls("Conditional Show") {
+		<div
+			data-signals={ fmtf("{numRed: %d, numBlue: %d}", numRed, numBlue) }
+			data-on-load="@get('/condshow/')"
+			data-on-change="@get('/condshow/')"
+		>
+			<label>
+				Number of red elements:
+				<input type="number" min="1" step="1" value={ fmtf("%d", numRed) } data-bind-numred/>
+				<strong data-show="!Number.isInteger(+$numRed) || +$numRed <= 0">
+					Not a positive integer
+				</strong>
+			</label>
+			<br/>
+			<label>
+				Number of blue elements:
+				<input type="number" min="1" step="1" value={ fmtf("%d", numBlue) } data-bind-numblue/>
+				<strong data-show="!Number.isInteger(+$numBlue) || +$numBlue <= 0">
+					Not a positive integer
+				</strong>
+			</label>
+			<p>ℹ️ Click on any circle to toggle</p>
+		</div>
+	}
+	<hr/>
+	<div id="content">Loading...</div>
+}
+
+templ FragCondShowContent(numRed, numBlue int) {
+	<div id="content">
+		<style>
+			#container {
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+				cursor: pointer;
+			}
+			.red {
+				margin: .1rem;
+				width: 1rem; height: 1rem;
+				background-color: red;
+				border-radius: .5rem;
+			}
+			.blue {
+				margin: .1rem;
+				width: 1rem; height: 1rem;
+				background-color: blue;
+				border-radius: .5rem;
+			}
+		</style>
+		<div id="container" data-on-click="$_swapped = !$_swapped">
+			for range numRed {
+				<div class="red" data-show="$_swapped"></div>
+			}
+			for range numBlue {
+				<div class="blue" data-show="!$_swapped"></div>
+			}
+		</div>
+	</div>
+}

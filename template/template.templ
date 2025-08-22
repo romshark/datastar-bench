@@ -1,0 +1,60 @@
+package template
+
+import (
+	"fmt"
+	"time"
+)
+
+templ page() {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<title>D* Bench</title>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<meta name="description" content="Todostar - a Datastar tech demo."/>
+			<link rel="icon" href="https://twemoji.maxcdn.com/v/latest/svg/1f680.svg" type="image/svg+xml"/>
+			<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js"></script>
+			<style>
+		html,
+		body {
+			font-family: sans-serif;
+		}
+	</style>
+		</head>
+		<body>
+			{ children... }
+		</body>
+	</html>
+}
+
+templ FragUpdate(renderTime time.Duration, comp templ.Component) {
+	<span id="renderstat"><sub>Rendering time</sub><br/>{ renderTime.String() }</span>
+	@comp
+}
+
+templ controls(subsection string) {
+	<div
+		style="
+			position: sticky; display: block;
+			background: white; top: 0; padding-bottom: .5rem;
+		"
+	>
+		<nav
+			style="
+			margin-bottom: 1rem; display: flex;
+			justify-content: space-between; align-items: start;
+		"
+		>
+			<h3 style="margin: 0;">
+				<a href="/">Home</a> ▸
+				{ subsection }
+			</h3>
+			<div style="display: inline-block; position: absolute; top: 0; right: .5rem;">
+				<span id="renderstat">Rendering...</span>
+			</div>
+		</nav>
+		{ children... }
+	</div>
+}
+
+func fmtf(format string, a ...any) string { return fmt.Sprintf(format, a...) }

@@ -1,0 +1,40 @@
+package template
+
+templ PageCheckboxes() {
+	@page() {
+		@ViewCheckboxes(100)
+	}
+}
+
+templ ViewCheckboxes(num int) {
+	@page() {
+		@controls("Checkbox Sync") {
+			<div
+				data-signals={ fmtf("{num: %d}", num) }
+				data-on-load="@get('/checkboxes/')"
+				data-on-change="@get('/checkboxes/')"
+			>
+				<label>
+					Number of checkbox elements:
+					<input type="number" min="1" step="1" value={ fmtf("%d", num) } data-bind-num/>
+					<strong data-show="!Number.isInteger(+$num) || +$num <= 0">
+						Not a positive integer
+					</strong>
+				</label>
+			</div>
+		}
+		<hr/>
+		<div id="content">Loading...</div>
+	}
+}
+
+templ FragCheckboxesContent(num int) {
+	<div id="content">
+		for i := range num {
+			<label>
+				{ fmtf("%d", i) }
+				<input type="checkbox" data-bind="_checked"/>
+			</label>
+		}
+	</div>
+}

@@ -1,0 +1,55 @@
+package template
+
+import (
+	"fmt"
+	"time"
+)
+
+templ PageSSEPatchRep() {
+	@page() {
+		@ViewSSEPatchRep(20)
+	}
+}
+
+templ ViewSSEPatchRep(ratePerSec int) {
+	@controls("SSE Patch Replace") {
+		<div
+			data-signals={ fmtf("{ratepersec: %d}", ratePerSec) }
+			data-on-load="@get('/ssepatchrep/')"
+			data-on-change="@get('/ssepatchrep/')"
+		>
+			<label>
+				Update rate in hz:
+				<input
+					type="number"
+					min="1"
+					step="1"
+					value={ fmtf("%d", ratePerSec) }
+					placeholder="Rate per second"
+					data-bind-ratepersec
+				/>
+				<strong data-show="!Number.isInteger(+$ratepersec) || +$ratepersec <= 0">
+					Not a positive integer
+				</strong>
+			</label>
+		</div>
+	}
+	<hr/>
+	<div id="content">Loading...</div>
+}
+
+templ FragSSEPatchRepContent(counter int64, start, now time.Time) {
+	<div id="content">
+		Update { fmtf("%d", counter) }.
+		<br/>
+		Current time is: { now.String() }
+		<br/>
+		Rate: { func() string {
+			elapsed := now.Sub(start).Seconds()
+			if elapsed <= 0 {
+				return "n/a"
+			}
+			return fmt.Sprintf("%.2f/s", float64(counter)/elapsed)
+		}() }
+	</div>
+}

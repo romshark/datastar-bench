@@ -1,0 +1,67 @@
+package template
+
+import (
+	"fmt"
+	"time"
+)
+
+templ PageSSEPatchMorph() {
+	@page() {
+		@ViewSSEPatchMorph(true, 20)
+	}
+}
+
+templ ViewSSEPatchMorph(rateLimit bool, ratePerSec int) {
+	@controls("SSE Patch Morph") {
+		<div
+			data-signals={ fmtf("{ratelimit: %t, ratepersec: %d}", rateLimit, ratePerSec) }
+			data-on-load="@get('/ssepatchmorph/')"
+			data-on-change="@get('/ssepatchmorph/')"
+		>
+			<p>{ fmtf("%t", rateLimit) }</p>
+			<label>
+				Rate limit:
+				<input
+					type="checkbox"
+					if rateLimit {
+						checked
+					}
+					data-bind-ratelimit
+				/>
+			</label>
+			<label>
+				Update rate in hz:
+				<input
+					type="number"
+					min="1"
+					step="1"
+					value={ fmtf("%d", ratePerSec) }
+					placeholder="Rate per second"
+					data-attr-disabled="!$ratelimit"
+					data-bind-ratepersec
+				/>
+				<strong data-show="!Number.isInteger(+$ratepersec) || +$ratepersec <= 0">
+					Not a positive integer
+				</strong>
+			</label>
+		</div>
+	}
+	<hr/>
+	<div id="content">Loading...</div>
+}
+
+templ FragSSEPatchMorphContent(counter int64, start, now time.Time) {
+	<div id="content">
+		Update { fmtf("%d", counter) }.
+		<br/>
+		Current time is: { now.String() }
+		<br/>
+		Rate: { func() string {
+			elapsed := now.Sub(start).Seconds()
+			if elapsed <= 0 {
+				return "n/a"
+			}
+			return fmt.Sprintf("%.2f/s", float64(counter)/elapsed)
+		}() }
+	</div>
+}

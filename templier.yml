@@ -1,0 +1,48 @@
+proxy-timeout: 10s
+format: false
+lint: true
+templier-host: "localhost:7331"
+
+log:
+  level: erronly
+  clear-on: restart
+  print-js-debug-logs: true
+
+debounce: 50ms
+
+tls:
+
+app:
+  dir-src-root: "./"
+  exclude:
+    - ".*" # All hidden files.
+    - "*~" # Any temporary backup files IDEs might use.
+    - node_modules/*
+    - README.md
+  dir-cmd: "."
+  dir-work: "."
+  host: "http://0.0.0.0:8080"
+  flags: -host 0.0.0.0:8080
+
+custom-watchers:
+  - name: "Go mod update"
+    cmd:
+    include:
+      - "go.mod"
+      - "go.sum"
+    exclude:
+    debounce:
+    fail-on-error: true
+    requires: rebuild
+
+compiler:
+  gcflags:
+  ldflags:
+  asmflags:
+  race:
+  msan:
+  tags:
+  trimpath:
+  p:
+  env:
+    CGO_ENABLED: 0

@@ -1,0 +1,71 @@
+package template
+
+templ PageTextExpr() {
+	@page() {
+		@ViewTextExpr(100)
+	}
+}
+
+templ ViewTextExpr(num int) {
+	@controls("Text Transformation Expressions") {
+		<div
+			data-signals={ fmtf("{num: %d}", num) }
+			data-on-load="@get('/textexpr/')"
+			data-on-change="@get('/textexpr/')"
+		>
+			<label>
+				Number of span elements:
+				<input type="number" min="1" step="1" value={ fmtf("%d", num) } data-bind-num/>
+				<strong data-show="!Number.isInteger(+$num) || +$num <= 0">
+					Not a positive integer
+				</strong>
+			</label>
+			<br/>
+			<label>
+				Original text:
+				<input data-signals="{_tx: 'Hello World'}" data-bind-_tx/>
+			</label>
+		</div>
+	}
+	<hr/>
+	<div id="content">Loading...</div>
+}
+
+templ FragTextExprContent(num int) {
+	<div id="content">
+		<table>
+			<thead>
+				<tr>
+					<td>Clip 10b</td>
+					<td>Upper</td>
+					<td>Lower</td>
+					<td>Regex</td>
+					<td>Base64</td>
+				</tr>
+			</thead>
+			<tbody>
+				for range num {
+					<tr>
+						<td data-text="$_tx.length > 10 ? $_tx.slice(0,7)+'...' : $_tx"></td>
+						<td data-text="$_tx.toUpperCase()"></td>
+						<td data-text="$_tx.toLowerCase()"></td>
+						<td data-text="$_tx.replace(/[aeiou]/gi, '·')"></td>
+						<td data-text="btoa($_tx)"></td>
+					</tr>
+				}
+			</tbody>
+		</table>
+		<style>
+			table {
+				margin-top: 1rem;
+				border-collapse: collapse;
+			}
+			td {
+				border: 1px solid grey;
+				margin: 0;
+				padding-left: .5rem;
+				padding-right: .5rem;
+			}
+		</style>
+	</div>
+}

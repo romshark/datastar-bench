@@ -1,0 +1,46 @@
+package template
+
+templ PageTextBind() {
+	@page() {
+		@ViewTextBind(100)
+	}
+}
+
+templ ViewTextBind(num int) {
+	@controls("Text Bind") {
+		<div
+			data-signals={ fmtf("{num: %d}", num) }
+			data-on-load="@get('/textbind/')"
+			data-on-change="@get('/textbind/')"
+		>
+			<label>
+				Number of span elements:
+				<input type="number" min="1" step="1" value={ fmtf("%d", num) } data-bind-num/>
+				<strong data-show="!Number.isInteger(+$num) || +$num <= 0">
+					Not a positive integer
+				</strong>
+			</label>
+			<br/>
+			<label>
+				Text:
+				<input data-signals="{_tx: 'Hello World'}" data-bind-_tx/>
+			</label>
+		</div>
+	}
+	<hr/>
+	<div id="content">Loading...</div>
+}
+
+templ FragTextBindContent(num int) {
+	<div id="content">
+		<p>
+			for i := range num {
+				<span>
+					{ fmtf("%d", i) } -
+				</span>
+				<span data-text="$_tx"></span>
+				&nbsp;
+			}
+		</p>
+	</div>
+}
