@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	jsonv2 "github.com/go-json-experiment/json"
+
 	"github.com/bytedance/sonic"
 	"github.com/romshark/datastar-bench/template"
 )
@@ -58,6 +60,18 @@ func BenchmarkChatJSONStd(b *testing.B) {
 	for b.Loop() {
 		buffer.Reset()
 		err := json.NewEncoder(&buffer).Encode(dataFatMorph2)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+func BenchmarkChatJSONStdV2(b *testing.B) {
+	var buffer bytes.Buffer
+	buffer.Grow(8 * 1024)
+	for b.Loop() {
+		buffer.Reset()
+		err := jsonv2.MarshalWrite(&buffer, dataFatMorph2)
 		if err != nil {
 			b.Fatal(err)
 		}
