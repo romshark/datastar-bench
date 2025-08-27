@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"flag"
 	"log/slog"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -33,6 +35,7 @@ func main() {
 	handle("/condshow/{$}", getCondshow)
 	handle("/ssepatchrep/{$}", getSSEPatchRep)
 	handle("/ssepatchmorph/{$}", getSSEPatchMorph)
+	handle("/ssepatchfatmorph/{$}", getSSEPatchFatMorph)
 	slog.Info("listeninig", slog.String("host", *fHost))
 	panic(http.ListenAndServe(*fHost, nil))
 }
@@ -213,6 +216,86 @@ func getSSEPatchMorph(w http.ResponseWriter, r *http.Request) {
 							),
 						),
 						"ssepatch morph update")
+				}
+			}
+			return nil
+		},
+	)
+}
+
+var dataFatMorph1 = func() (data *template.DataFatMorph) {
+	fc, err := os.ReadFile("./chat-resp-1.json")
+	if err != nil {
+		panic(err)
+	}
+	err = json.Unmarshal(fc, &data)
+	if err != nil {
+		panic(err)
+	}
+	return data
+}()
+
+var dataFatMorph2 = func() (data *template.DataFatMorph) {
+	fc, err := os.ReadFile("./chat-resp-2.json")
+	if err != nil {
+		panic(err)
+	}
+	err = json.Unmarshal(fc, &data)
+	if err != nil {
+		panic(err)
+	}
+	return data
+}()
+
+func getSSEPatchFatMorph(w http.ResponseWriter, r *http.Request) {
+	type Sigs struct {
+		Run        bool    `json:"run"`
+		RateLimit  bool    `json:"ratelimit"`
+		RatePerSec float64 `json:"ratepersec"`
+	}
+	start := time.Now()
+
+	renderPage(w, r, "page sse patch fat morph", template.PageSSEPatchFatMorph(),
+		func(sse *datastar.ServerSentEventGenerator, s Sigs) error {
+			patch := func(counter int64, initialStart time.Time) {
+				data := dataFatMorph1
+				if counter%2 == 0 {
+					data = dataFatMorph2
+				}
+				patch(sse,
+					template.FragUpdate(
+						time.Since(start),
+						template.FragSSEPatchFatMorphContent(
+							counter, initialStart, time.Now(), data,
+						),
+					), "ssepatch fat morph update")
+			}
+
+			initialStart := time.Now()
+			if !s.Run {
+				patch(0, initialStart)
+				return nil
+			}
+			if s.RateLimit {
+				interval := time.Second / time.Duration(s.RatePerSec)
+				tk := time.NewTicker(interval)
+			LOOP:
+				for c := int64(0); ; {
+					select {
+					case <-sse.Context().Done():
+						break LOOP
+					case <-tk.C:
+						start = time.Now()
+						c++
+						patch(c, initialStart)
+					}
+				}
+			} else {
+				// Unlimited rate, shoot as fast as you can 🚀
+				for c := int64(0); sse.Context().Err() == nil; {
+					start = time.Now()
+					c++
+					patch(c, initialStart)
 				}
 			}
 			return nil

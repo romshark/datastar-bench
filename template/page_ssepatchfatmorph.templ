@@ -1,0 +1,219 @@
+package template
+
+import (
+	"fmt"
+	"time"
+)
+
+templ PageSSEPatchFatMorph() {
+	@page() {
+		@ViewSSEPatchFatMorph(false, true, 10)
+	}
+}
+
+templ ViewSSEPatchFatMorph(run, rateLimit bool, ratePerSec int) {
+	<style>
+		#chatview {
+			margin: 0;
+			padding: 0;
+			font-family: Arial, sans-serif;
+			background-size: cover;
+			height: 100vh;
+			display: flex;
+			flex-direction: column;
+			max-height: 70vh;
+		
+			#controls {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				gap: .5rem;
+				padding: 1rem;
+			}
+			#textinput {
+				padding: .5rem;
+				flex-grow: 1;
+			}
+			#header {
+				display: flex;
+				align-items: center;
+				background-color: rgba(0,0,0,.6);
+				padding: .5rem;
+				color: #fff;
+			
+				img {
+					border-radius: 50%;
+					width: 2.5rem;
+					height: 2.5rem;
+					margin-right: .5rem;
+				}
+			}
+			#chat-info {
+				display: flex;
+				flex-direction: column;
+				gap: .2rem;
+			}
+			#chat-title {
+				font-size: 1rem;
+				font-weight: bold;
+			}
+			#chat-participants {
+				font-size: .8rem;
+				opacity: .75;
+			}
+			#messages {
+				flex: 1;
+				overflow-y: auto;
+				padding: 1rem;
+				display: flex;
+				flex-direction: column;
+				gap: .5rem;
+			}
+			.message {
+				max-width: 70%;
+				padding: .75rem;
+				border-radius: 1rem;
+				font-size: .8rem;
+				line-height: 1.4;
+				display: inline-block;
+				word-wrap: break-word;
+			}
+			.message.sent {
+				align-self: flex-end;
+				background-color: #0084ff;
+				color: #fff;
+				border-bottom-right-radius: 2px;
+			}
+			.message.received {
+				align-self: flex-start;
+				background-color: #f1f0f0;
+				color: #000;
+				border-bottom-left-radius: 2px;
+			}
+			.timestamp {
+				font-size: 11px;
+				color: #999;
+				margin-top: 4px;
+			}
+		}
+	</style>
+	@controls("SSE Patch Fat Morph") {
+		<div
+			data-signals={ fmtf(
+				"{run: %t, ratelimit: %t, ratepersec: %d}",
+				run, rateLimit, ratePerSec,
+			) }
+			data-on-load="@get('/ssepatchfatmorph/')"
+			data-on-change="@get('/ssepatchfatmorph/')"
+		>
+			<label>
+				Run:
+				<input
+					type="checkbox"
+					if run {
+						checked
+					}
+					data-bind-run
+				/>
+			</label>
+			<label>
+				Rate limit:
+				<input
+					type="checkbox"
+					if rateLimit {
+						checked
+					}
+					data-bind-ratelimit
+				/>
+			</label>
+			<label>
+				Update rate in hz:
+				<input
+					type="number"
+					min="1"
+					step="1"
+					value={ fmtf("%d", ratePerSec) }
+					placeholder="Rate per second"
+					data-attr-disabled="!$ratelimit"
+					data-bind-ratepersec
+				/>
+				<strong data-show="!Number.isInteger(+$ratepersec) || +$ratepersec <= 0">
+					Not a positive integer
+				</strong>
+			</label>
+		</div>
+	}
+	<hr/>
+	<div id="content">Loading...</div>
+}
+
+type DataFatMorph struct {
+	Chat   DataFatMorphChat `json:"chat"`
+	UserID string           `json:"user-id"`
+}
+
+type DataFatMorphChat struct {
+	Name               string                    `json:"name"`
+	Participants       int32                     `json:"participants"`
+	AvatarImageURL     string                    `json:"avatar-img-url"`
+	BackgroundImageURL string                    `json:"bg-img-url"`
+	Messages           []DataFatMorphChatMessage `json:"messages"`
+}
+
+type DataFatMorphChatMessage struct {
+	ID     string    `json:"id"`
+	Time   time.Time `json:"time"`
+	Sender string    `json:"sender"`
+	Text   string    `json:"text"`
+}
+
+templ FragSSEPatchFatMorphContent(
+	counter int64, start, now time.Time, data *DataFatMorph,
+) {
+	<div id="content">
+		Update { fmtf("%d", counter) }.
+		<br/>
+		Rate: { func() string {
+			elapsed := now.Sub(start).Seconds()
+			if elapsed <= 0 {
+				return "n/a"
+			}
+			return fmt.Sprintf("%.2f/s", float64(counter)/elapsed)
+		}() }
+		// Chat View
+		<div
+			id="chatview"
+			style={ fmt.Sprintf(
+			"background: url(%s) no-repeat center center fixed;",
+			data.Chat.BackgroundImageURL,
+		) }
+		>
+			<div id="header">
+				<img src={ data.Chat.AvatarImageURL } alt="avatar"/>
+				<div id="chat-info">
+					<div id="chat-title">{ data.Chat.Name }</div>
+					<div id="chat-participants">{ fmt.Sprintf("%d Participants", data.Chat.Participants) }</div>
+				</div>
+			</div>
+			<div id="messages">
+				for _, msg := range data.Chat.Messages {
+					<div
+						if data.UserID == msg.Sender {
+							class="message sent"
+						} else {
+							class="message received"
+						}
+					>
+						<div>{ msg.Text }</div>
+						<div class="timestamp">{ msg.Time.Format("15:04") }</div>
+					</div>
+				}
+			</div>
+			<div id="controls">
+				<textarea id="textinput" placeholder="Message..."></textarea>
+				<button>Send</button>
+				<button>Attach</button>
+			</div>
+		</div>
+	</div>
+}

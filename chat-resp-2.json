@@ -1,0 +1,53 @@
+{
+    "chat": {
+        "name": "Group Chat",
+        "avatar-img-url": "https://placehold.co/256x256/EE00EE/FFF",
+        "bg-img-url": "https://images.unsplash.com/photo-1557411732-1797a9171fcf?w=1600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8c2VhbWxlc3MlMjBwYXR0ZXJufGVufDB8fDB8fHww",
+        "participants": 14229,
+        "messages": [{
+            "id": "20",
+            "time": "2025-08-27T10:10:56+00:00",
+            "sender": "Isabella",
+            "text": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+        }, {
+            "id": "21",
+            "time": "2025-08-27T10:20:10+00:00",
+            "sender": "Joe",
+            "text": "Yes, I like Lorem Ipsum too! But did you hear about data-star.dev?",
+            "reply-to": "20"
+        }, {
+            "id": "22",
+            "time": "2025-08-27T10:20:30+00:00",
+            "sender": "Bill",
+            "text": "Oh, did someone mention datastar?! Let's GO!!",
+            "reply-to": "21"
+        }, {
+            "id": "23",
+            "time": "2025-08-27T10:24:00+00:00",
+            "sender": "Amanda",
+            "text": "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.",
+            "reply-to": "20"
+        }, {
+            "id": "24",
+            "time": "2025-08-27T12:00:00+00:00",
+            "sender": "Isabella",
+            "text": "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.",
+            "pictures": [
+                "https://placehold.co/1920x1080/000000/EFA",
+                "https://placehold.co/500x500/EEFFEE/BBB"
+            ],
+            "reply-to": "23"
+        }, {
+            "id": "24",
+            "time": "2025-08-27T12:00:00+00:00",
+            "sender": "Bot",
+            "text": "1 alert(s) in: HTTP JSON API"
+        }, {
+            "id": "25",
+            "time": "2025-08-27T12:01:15+00:00",
+            "sender": "Marc",
+            "text": "I'm already looking into this 👆"
+        }]
+    },
+    "user-id": "Bill"
+}
