@@ -24,9 +24,14 @@ func main() {
 	fHost := flag.String("host", ":8080", "host address")
 	flag.Parse()
 
+	mux := http.NewServeMux()
+
 	handle := func(pattern string, handlerFn http.HandlerFunc) {
-		http.Handle(pattern, withBrotli(handlerFn))
+		mux.Handle(pattern, withBrotli(handlerFn))
 	}
+
+	waitAckFatMorph := make(chan struct{})
+
 	handle("/", getIndex)
 	handle("/inputs/{$}", getInputs)
 	handle("/checkboxes/{$}", getCheckboxes)
@@ -35,9 +40,11 @@ func main() {
 	handle("/condshow/{$}", getCondshow)
 	handle("/ssepatchrep/{$}", getSSEPatchRep)
 	handle("/ssepatchmorph/{$}", getSSEPatchMorph)
-	handle("/ssepatchfatmorph/{$}", getSSEPatchFatMorph)
+	handle("/ssepatchfatmorph/{$}", makeGetSSEPatchFatMorph(waitAckFatMorph))
+	handle("POST /ssepatchfatmorph/ack/{$}", makeGetSSEPatchFatMorphAck(waitAckFatMorph))
+
 	slog.Info("listeninig", slog.String("host", *fHost))
-	panic(http.ListenAndServe(*fHost, nil))
+	panic(http.ListenAndServe(*fHost, mux))
 }
 
 func getIndex(w http.ResponseWriter, r *http.Request) {
@@ -247,60 +254,76 @@ var dataFatMorph2 = func() (data *template.DataFatMorph) {
 	return data
 }()
 
-func getSSEPatchFatMorph(w http.ResponseWriter, r *http.Request) {
-	type Sigs struct {
-		Run        bool    `json:"run"`
-		RateLimit  bool    `json:"ratelimit"`
-		RatePerSec float64 `json:"ratepersec"`
-	}
-	start := time.Now()
+func makeGetSSEPatchFatMorph(waitAck <-chan struct{}) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		type Sigs struct {
+			Run        bool    `json:"run"`
+			RateLimit  bool    `json:"ratelimit"`
+			RatePerSec float64 `json:"ratepersec"`
+		}
+		start := time.Now()
 
-	renderPage(w, r, "page sse patch fat morph", template.PageSSEPatchFatMorph(),
-		func(sse *datastar.ServerSentEventGenerator, s Sigs) error {
-			patch := func(counter int64, initialStart time.Time) {
-				data := dataFatMorph1
-				if counter%2 == 0 {
-					data = dataFatMorph2
+		renderPage(w, r, "page sse patch fat morph", template.PageSSEPatchFatMorph(),
+			func(sse *datastar.ServerSentEventGenerator, s Sigs) error {
+				patch := func(counter int64, initialStart time.Time) {
+					data := dataFatMorph1
+					if counter%2 == 0 {
+						data = dataFatMorph2
+					}
+					patch(sse,
+						template.FragUpdate(
+							time.Since(start),
+							template.FragSSEPatchFatMorphContent(
+								counter, initialStart, time.Now(), data,
+							),
+						), "ssepatch fat morph update")
 				}
-				patch(sse,
-					template.FragUpdate(
-						time.Since(start),
-						template.FragSSEPatchFatMorphContent(
-							counter, initialStart, time.Now(), data,
-						),
-					), "ssepatch fat morph update")
-			}
 
-			initialStart := time.Now()
-			if !s.Run {
-				patch(0, initialStart)
-				return nil
-			}
-			if s.RateLimit {
-				interval := time.Second / time.Duration(s.RatePerSec)
-				tk := time.NewTicker(interval)
-			LOOP:
-				for c := int64(0); ; {
-					select {
-					case <-sse.Context().Done():
-						break LOOP
-					case <-tk.C:
+				initialStart := time.Now()
+				if !s.Run {
+					patch(0, initialStart)
+					return nil
+				}
+				if s.RateLimit {
+					interval := time.Second / time.Duration(s.RatePerSec)
+					tk := time.NewTicker(interval)
+				LOOP:
+					for c := int64(0); ; {
+						select {
+						case <-sse.Context().Done():
+							break LOOP
+						case <-tk.C:
+							start = time.Now()
+							c++
+							patch(c, initialStart)
+							select { // Wait until stream closes or ack is received.
+							case <-sse.Context().Done():
+							case <-waitAck:
+							}
+						}
+					}
+				} else {
+					// Unlimited rate, shoot as fast as you can 🚀
+					for c := int64(0); sse.Context().Err() == nil; {
 						start = time.Now()
 						c++
 						patch(c, initialStart)
+						select { // Wait until stream closes or ack is received.
+						case <-sse.Context().Done():
+						case <-waitAck:
+						}
 					}
 				}
-			} else {
-				// Unlimited rate, shoot as fast as you can 🚀
-				for c := int64(0); sse.Context().Err() == nil; {
-					start = time.Now()
-					c++
-					patch(c, initialStart)
-				}
-			}
-			return nil
-		},
-	)
+				return nil
+			},
+		)
+	}
+}
+
+func makeGetSSEPatchFatMorphAck(waitAck chan<- struct{}) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		waitAck <- struct{}{}
+	}
 }
 
 var defaultSSEOpts = []datastar.SSEOption{

@@ -98,6 +98,21 @@ templ ViewSSEPatchFatMorph(run, rateLimit bool, ratePerSec int) {
 		}
 	</style>
 	@controls("SSE Patch Fat Morph") {
+		<script data-ignore-morph>
+			(function () {
+				if (window.__fatMorphAckObserverInit) return;
+				window.__fatMorphAckObserverInit = true;
+				document.addEventListener("DOMContentLoaded", () => {
+					const target = document.getElementById("content");
+					const obs = new MutationObserver(() => {
+						requestAnimationFrame(() => {
+							fetch("/ssepatchfatmorph/ack/", { method: "POST" });
+						});
+					});
+					obs.observe(target, { childList: true, subtree: true });
+				});
+			})();
+		</script>
 		<div
 			data-signals={ fmtf(
 				"{run: %t, ratelimit: %t, ratepersec: %d}",

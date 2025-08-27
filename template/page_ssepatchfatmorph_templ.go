@@ -97,7 +97,7 @@ func ViewSSEPatchFatMorph(run, rateLimit bool, ratePerSec int) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div data-signals=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<script data-ignore-morph>\n\t\t\t(function () {\n\t\t\t\tif (window.__fatMorphAckObserverInit) return;\n\t\t\t\twindow.__fatMorphAckObserverInit = true;\n\t\t\t\tdocument.addEventListener(\"DOMContentLoaded\", () => {\n\t\t\t\t\tconst target = document.getElementById(\"content\");\n\t\t\t\t\tconst obs = new MutationObserver(() => {\n\t\t\t\t\t\trequestAnimationFrame(() => {\n\t\t\t\t\t\t\tfetch(\"/ssepatchfatmorph/ack/\", { method: \"POST\" });\n\t\t\t\t\t\t});\n\t\t\t\t\t});\n\t\t\t\t\tobs.observe(target, { childList: true, subtree: true });\n\t\t\t\t});\n\t\t\t})();\n\t\t</script> <div data-signals=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -107,7 +107,7 @@ func ViewSSEPatchFatMorph(run, rateLimit bool, ratePerSec int) templ.Component {
 				run, rateLimit, ratePerSec,
 			))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 105, Col: 4}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 120, Col: 4}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -140,7 +140,7 @@ func ViewSSEPatchFatMorph(run, rateLimit bool, ratePerSec int) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmtf("%d", ratePerSec))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 135, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 150, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -214,7 +214,7 @@ func FragSSEPatchFatMorphContent(
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(fmtf("%d", counter))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 174, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 189, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -233,7 +233,7 @@ func FragSSEPatchFatMorphContent(
 			return fmt.Sprintf("%.2f/s", float64(counter)/elapsed)
 		}())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 182, Col: 5}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 197, Col: 5}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -249,7 +249,7 @@ func FragSSEPatchFatMorphContent(
 			data.Chat.BackgroundImageURL,
 		))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 189, Col: 3}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 204, Col: 3}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -262,7 +262,7 @@ func FragSSEPatchFatMorphContent(
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(data.Chat.AvatarImageURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 192, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 207, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -275,7 +275,7 @@ func FragSSEPatchFatMorphContent(
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(data.Chat.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 194, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 209, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -288,7 +288,7 @@ func FragSSEPatchFatMorphContent(
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d Participants", data.Chat.Participants))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 195, Col: 89}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 210, Col: 89}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -321,7 +321,7 @@ func FragSSEPatchFatMorphContent(
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(msg.Text)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 207, Col: 21}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 222, Col: 21}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
@@ -334,7 +334,7 @@ func FragSSEPatchFatMorphContent(
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(msg.Time.Format("15:04"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 208, Col: 55}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `template/page_ssepatchfatmorph.templ`, Line: 223, Col: 55}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
